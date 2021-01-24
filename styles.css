@@ -1,0 +1,19 @@
+body {
+  background-color: floralwhite;
+}
+
+#player1name,
+#player3name,
+label[for="redtrickstaken"] {
+  color: firebrick;
+}
+
+#player2name,
+#player4name,
+label[for="bluetrickstaken"] {
+  color: mediumblue;
+}
+
+div {
+  border-bottom: 1px solid black;
+}
