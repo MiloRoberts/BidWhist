@@ -1,0 +1,16 @@
+{
+  "name": "bid-whist",
+  "version": "0.0.1",
+  "description": "socket.io bid whist app",
+  "engines": {
+      "node": "14.x"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^3.1.0"
+  }
+}

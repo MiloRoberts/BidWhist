@@ -5,71 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bid Wist</title>
     <link rel="stylesheet" href="styles.css" />
-    <script>
-      var deck = [];
-      var suits = ["Clubs", "Diamonds", "Hearts", "Spades"];
-      var ranks = [
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "Jack",
-        "Queen",
-        "King",
-        "Ace",
-      ];
-      // comment
-      for (suit in suits) {
-        for (rank in ranks) {
-          deck.push(ranks[rank] + " of " + suits[suit]);
-        }
-      }
-
-      function shuffledeck() {
-        for (card in deck) {
-          var randomnumber = Math.floor(Math.random() * 52);
-          var placeholder = deck[randomnumber];
-          deck[randomnumber] = deck[card];
-          deck[card] = placeholder;
-        }
-      }
-
-      var player1hand = [];
-      var player2hand = [];
-      var player3hand = [];
-      var player4hand = [];
-      var playerhands = [player1hand, player2hand, player3hand, player4hand];
-      var kitty = [];
-
-      function dealcards() {
-        for (hand in playerhands) {
-          while (playerhands[hand].length <= 11) {
-            playerhands[hand].push(deck[deck.length - 1]);
-            deck.pop();
-          }
-        }
-        kitty = deck;
-        deck = [];
-      }
-
-      function startnewround() {
-        shuffledeck();
-        dealcards();
-      }
-
-      // TO DO: change to get element of particular player
-      function changename() {
-        document.getElementById("player1name").innerHTML = prompt(
-          "Enter your name: ",
-          ""
-        );
-      }
-    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/client.js"></script>
   </head>
   <body>
     <div id="player1">
@@ -99,7 +36,10 @@
       <label for="bluetrickstaken">Blue Team: </label>
       <input type="text" id="bluetrickstaken" size="1" />
     </div>
-    <button type="button" onclick="changename()">Test</button>
+    <form id="nameForm" action="">
+      <input id="nameInput" autocomplete="off" /><button type="submit">SetName</button>
+    </form>
+    <button id="newRound">New Round</button>
     <p id="test">test display</p>
   </body>
 </html>
