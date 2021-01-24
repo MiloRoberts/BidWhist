@@ -20,7 +20,7 @@ var options = {
   dotfiles: 'ignore',
   etag: false,
   extensions: ['htm', 'html'],
-  index: false,
+  index: 'index.html',
   maxAge: '1d',
   redirect: false,
   setHeaders: function (res, path, stat) {
@@ -29,10 +29,6 @@ var options = {
 }
 
 app.use(express.static('public', options))
-
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
-});
 
 var whist = require('./whistgame');
 
