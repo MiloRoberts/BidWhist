@@ -38,6 +38,11 @@ window.addEventListener("load", function() {
       console.log(players);
     });
 
+    socket.on('hand', function(hand) {
+      console.log(hand);
+    });
+
+
     newRound.addEventListener('click', function() {
       socket.emit('new round');
     });

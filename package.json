@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "socket.io bid whist app",
   "engines": {
-      "node": "14.x"
+    "node": "14.x"
   },
   "main": "index.js",
   "scripts": {
