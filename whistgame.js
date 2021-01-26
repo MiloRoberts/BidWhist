@@ -7,7 +7,7 @@ var user_id;
 //var dealer = 0;
 var trick_count = [0,0];
 
-var debug = true;
+var debug = false;
 
 exports.initGame = function(in_io, in_socket){
   io = in_io;
@@ -20,6 +20,8 @@ exports.initGame = function(in_io, in_socket){
   socket.on('set name', setName);
   socket.on('new round', nextRound);
   socket.on('new game', newGame);
+  socket.on('play card', playCard);
+  //socket.on('unplay card', unplayCard);
 
 }
 
@@ -68,6 +70,18 @@ function nextRound(){
 
 function sendGameStatus(){
     round.sendHands();
+    //round.sendTableTop();
     //send each player their hand
     //TODO
+}
+
+function playCard(card_id){
+    round.playCard(card_id, user_id);
+    //round.sendTableTop();
+    //send each player their hand
+}
+function unPlayCard(){
+    round.unplayCard(user_id);
+    io.emit('table top', round.getTable());
+    //send each player their hand
 }
