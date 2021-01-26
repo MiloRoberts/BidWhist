@@ -29,7 +29,7 @@ window.addEventListener("load", function () {
   nameForm.addEventListener("submit", function (e) {
     e.preventDefault();
     if (nameInput.value) {
-      socket.emit("set name", nameInput.value);
+      socket.emit("set name", userId, nameInput.value);
       //input.value = '';
     }
   });
@@ -43,7 +43,23 @@ window.addEventListener("load", function () {
     */
 
   socket.on("players", function (players) {
-    console.log(players);
+    //console.log(players);
+  });
+  socket.on("table top", function(table){
+      //console.log(table);
+    for (i = 0; i < 4; ++i) {
+      var card_button = document.getElementsByClassName("playercard")[i]
+
+      if(card_button){
+        if(table[i]){
+          card_button.innerHTML = table[i]["rank"] + " of " + table[i]["suit"];
+          card_button.setAttribute("id", table[i]["id"]);
+        } else {
+          card_button.innerHTML = ""
+          card_button.setAttribute("id", "");
+        }
+      }
+    }
   });
 
   socket.on("hand", function (hand) {
@@ -55,14 +71,28 @@ window.addEventListener("load", function () {
       document
         .getElementsByClassName("hand")
         [i].setAttribute("id", hand[i]["id"]);
-      document
+      /*document
         .getElementsByClassName("hand")
         [i].addEventListener("click", function (e) {
           e.preventDefault();
           alert(this.getAttribute("id"));
+          //socket.emit("play card", this.getAttribute("id"));
         });
+        */
     }
   });
+
+  var card_buttons = document.getElementsByClassName("hand");
+  for( i=0; i < card_buttons.length; ++i){
+  console.log(card_buttons[i]);
+      document
+        .getElementsByClassName("hand")[i]
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          //alert(this.getAttribute("id"));
+          socket.emit("play card", userId, this.getAttribute("id"));
+      });
+  }
 
   newRound.addEventListener("click", function () {
     socket.emit("new round");
