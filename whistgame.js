@@ -69,7 +69,18 @@ function nextRound(){
 
 
 function sendGameStatus(){
-    round.sendHands();
+    //round.sendHands();
+    players = users.getPlayers();
+    for(p in players){
+        let player = players[p];
+        let s = io.sockets.sockets.get(player['socket'])
+        if(s){
+            s.emit('hand', round.getHand(player['id']));
+        }
+    }
+
+    //TODO send hands
+    io.emit('table top', round.getTable());
     //round.sendTableTop();
     //send each player their hand
     //TODO
@@ -77,6 +88,7 @@ function sendGameStatus(){
 
 function playCard(card_id){
     round.playCard(card_id, user_id);
+    io.emit('table top', round.getTable());
     //round.sendTableTop();
     //send each player their hand
 }
