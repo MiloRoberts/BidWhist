@@ -49,11 +49,33 @@ window.addEventListener("load", function () {
   socket.on("hand", function (hand) {
     console.log(hand[0]["suit"]);
     console.log(hand[0]["rank"]);
+    document.getElementsByClassName("hand")[0].innerHTML =
+      hand[0]["rank"] + " of " + hand[0]["suit"];
+    document.getElementsByClassName("hand")[1].innerHTML =
+      hand[1]["rank"] + " of " + hand[1]["suit"];
+    document.getElementsByClassName("hand")[2].innerHTML =
+      hand[2]["rank"] + " of " + hand[2]["suit"];
+    document.getElementsByClassName("hand")[3].innerHTML =
+      hand[3]["rank"] + " of " + hand[3]["suit"];
+    document.getElementsByClassName("hand")[4].innerHTML =
+      hand[4]["rank"] + " of " + hand[4]["suit"];
+    document.getElementsByClassName("hand")[5].innerHTML =
+      hand[5]["rank"] + " of " + hand[5]["suit"];
+    document.getElementsByClassName("hand")[6].innerHTML =
+      hand[6]["rank"] + " of " + hand[6]["suit"];
+    document.getElementsByClassName("hand")[7].innerHTML =
+      hand[7]["rank"] + " of " + hand[7]["suit"];
+    document.getElementsByClassName("hand")[8].innerHTML =
+      hand[8]["rank"] + " of " + hand[8]["suit"];
+    document.getElementsByClassName("hand")[9].innerHTML =
+      hand[9]["rank"] + " of " + hand[9]["suit"];
+    document.getElementsByClassName("hand")[10].innerHTML =
+      hand[10]["rank"] + " of " + hand[10]["suit"];
+    document.getElementsByClassName("hand")[11].innerHTML =
+      hand[11]["rank"] + " of " + hand[11]["suit"];
   });
 
   newRound.addEventListener("click", function () {
     socket.emit("new round");
   });
-
-  document.getElementsByClassName("hand")[0].innerHTML = hand[0]["suit"];
 });
