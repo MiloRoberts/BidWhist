@@ -23,7 +23,7 @@
         "King",
         "Ace",
       ];
-      // comment
+
       for (suit in suits) {
         for (rank in ranks) {
           deck.push(ranks[rank] + " of " + suits[suit]);
@@ -60,6 +60,7 @@
       function startnewround() {
         shuffledeck();
         dealcards();
+        // send playerhand arrays to players
       }
 
       // TO DO: change to get element of particular player
