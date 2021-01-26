@@ -18,7 +18,7 @@ exports.initGame = function(in_io, in_socket){
   socket.on('disconnect', playerExit);
   //socket.on('chat message', sendChat);
   socket.on('set name', setName);
-  socket.on('new round', newRound);
+  socket.on('new round', nextRound);
   socket.on('new game', newGame);
 
 }
