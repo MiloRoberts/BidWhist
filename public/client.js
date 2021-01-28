@@ -43,56 +43,78 @@ window.addEventListener("load", function () {
     */
 
   socket.on("players", function (players) {
-    //console.log(players);
+    
+      //player1_name = document.querySelectorAll('#player1>.name')[0];
+    console.log(players);
+    console.log(socket.id);
+    for( i in players){
+        var name = document.querySelectorAll('#player'+(players[i]["seat"]+1)+'>.name')[0];
+        console.log(name);
+        console.log(players[i]["name"]);
+        name.innerText = players[i]["name"];
+        if(players[i]["socket"] == socket.id){
+            document.querySelectorAll('#player'+(players[i]["seat"]+1)+'>.playfield')[0].setAttribute('id', 'my-playfield');
+        }
+    }
+
   });
   socket.on("table top", function(table){
       //console.log(table);
     for (i = 0; i < 4; ++i) {
-      var card_button = document.getElementsByClassName("playercard")[i]
+      var playfield = document.getElementsByClassName("playfield")[i]
 
-      if(card_button){
-        if(table[i]){
-          card_button.innerHTML = table[i]["rank"] + " of " + table[i]["suit"];
-          card_button.setAttribute("id", table[i]["id"]);
-        } else {
-          card_button.innerHTML = ""
-          card_button.setAttribute("id", "");
+      if(playfield){ //make sure we have valid data
+        //remove any children
+        while (playfield.firstChild) {
+            console.log('wat');
+            playfield.removeChild(playfield.firstChild);
         }
-      }
-    }
+        if(table[i]){ //there is a card here
+            if(playfield.id == "my-playfield"){
+              var item = document.createElement('button');
+              item.setAttribute('id', table[i]["id"]);
+              item.innerHTML = table[i]["rank"] + " of " + table[i]["suit"];
+              item.addEventListener("click", function (e) {
+                  e.preventDefault();
+                  //alert(this.getAttribute("id"));
+                  socket.emit("unplay card", userId, this.getAttribute("id"));
+              });
+
+              playfield.appendChild(item);
+            } else {
+              var item = document.createElement('div');
+              item.innerText = table[i]["rank"] + " of " + table[i]["suit"];
+              item.setAttribute('id', table[i]["id"]);
+              playfield.appendChild(item);
+            }
+        } //end if table[i]
+      } //end if(playfield)
+    } //end for 0 to 3
   });
 
   socket.on("hand", function (hand) {
-    console.log(hand[0]["suit"]);
-    console.log(hand[0]["rank"]);
-    for (i = 0; i < hand.length; ++i) {
-      document.getElementsByClassName("hand")[i].innerHTML =
-        hand[i]["rank"] + " of " + hand[i]["suit"];
-      document
-        .getElementsByClassName("hand")
-        [i].setAttribute("id", hand[i]["id"]);
-      /*document
-        .getElementsByClassName("hand")
-        [i].addEventListener("click", function (e) {
-          e.preventDefault();
-          alert(this.getAttribute("id"));
-          //socket.emit("play card", this.getAttribute("id"));
-        });
-        */
+    
+    var hand_div = document.getElementById("hand");
+    //clear all existing entries first
+    while (hand_div.firstChild) {
+        hand_div.removeChild(hand_div.firstChild);
     }
-  });
 
-  var card_buttons = document.getElementsByClassName("hand");
-  for( i=0; i < card_buttons.length; ++i){
-  console.log(card_buttons[i]);
-      document
-        .getElementsByClassName("hand")[i]
-        .addEventListener("click", function (e) {
+    //create and add card buttons to the hand
+    for (i = 0; i < hand.length; ++i) {
+      var item = document.createElement('button');
+      item.setAttribute('class', 'hand');
+      item.setAttribute('id', hand[i]["id"]);
+      item.innerHTML = hand[i]["rank"] + " of " + hand[i]["suit"];
+      item.addEventListener("click", function (e) {
           e.preventDefault();
           //alert(this.getAttribute("id"));
           socket.emit("play card", userId, this.getAttribute("id"));
       });
-  }
+      hand_div.appendChild(item);
+    }
+
+  }); //end on "hand"
 
   newRound.addEventListener("click", function () {
     socket.emit("new round");

@@ -90,7 +90,7 @@ function sendGameStatus(){
 }
 
 function playCard(user_id, card_id){
-    console.log(card_id  +' ' + user_id);
+    //console.log(card_id  +' ' + user_id);
     round.playCard(user_id, card_id);
     io.emit('table top', round.getTable());
     socket.emit('hand', round.getHand(user_id));
