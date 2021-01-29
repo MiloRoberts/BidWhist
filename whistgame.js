@@ -21,21 +21,13 @@ exports.initGame = function(in_io, in_socket){
   socket.on('new game', newGame);
   socket.on('play card', playCard);
   socket.on('unplay card', unPlayCard);
+  socket.on('take kitty', takeKitty);
 
 }
 
 function playerConnected(user_id){
   users.identifyUser(user_id, socket.id);
-  users.seatUser(user_id);
-  /*console.log(users.getUsers())
-    if(userId == users.getUsers()[1]['userId']){
-
-        console.log(users.getUsers()[0]['socketId']);
-        //console.log(io.sockets.sockets)
-        var p1socket = io.sockets.sockets.get(users.getUsers()[0]['socketId']);
-        p1socket.emit('chat message', 'Player 2 joined');
-    }
-    */
+  io.emit('players', users.getPlayers());
 }
 
 function playerExit() {
@@ -49,8 +41,6 @@ function setName(user_id, name){
   //console.log('message: ' + msg);
 
   io.emit('players', users.getPlayers());
-    //TODO: fix this to not send IDs;
-  //io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
 }
 function newGame(){
     if(users.isGameFull()){
@@ -90,16 +80,26 @@ function sendGameStatus(){
 }
 
 function playCard(user_id, card_id){
-    //console.log(card_id  +' ' + user_id);
     round.playCard(user_id, card_id);
+    //emit table update to everyone
     io.emit('table top', round.getTable());
+    //update user's hand
     socket.emit('hand', round.getHand(user_id));
-    //round.sendTableTop();
-    //send each player their hand
 }
+
 function unPlayCard(user_id){
     round.unplayCard(user_id);
+    //emit table update to everyone
     io.emit('table top', round.getTable());
+    //update user's hand
     socket.emit('hand', round.getHand(user_id));
-    //send each player their hand
+}
+
+function takeKitty(user_id){
+    kitty_cards = round.takeKitty(user_id);
+
+    //emit users's hand which now includes the kitty
+    socket.emit('hand', round.getHand(user_id));
+    //emit table update to everyone
+    io.emit('table top', round.getTable());
 }

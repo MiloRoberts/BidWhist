@@ -33,14 +33,6 @@ window.addEventListener("load", function () {
       //input.value = '';
     }
   });
-  /*
-    socket.on('chat message', function(msg) {
-      var item = document.createElement('li');
-      item.textContent = msg;
-      messages.appendChild(item);
-      window.scrollTo(0, document.body.scrollHeight);
-    });
-    */
 
   socket.on("players", function (players) {
     
@@ -59,21 +51,21 @@ window.addEventListener("load", function () {
 
   });
   socket.on("table top", function(table){
-      //console.log(table);
+
+    //Update played cards
     for (i = 0; i < 4; ++i) {
       var playfield = document.getElementsByClassName("playfield")[i]
 
       if(playfield){ //make sure we have valid data
         //remove any children
         while (playfield.firstChild) {
-            console.log('wat');
             playfield.removeChild(playfield.firstChild);
         }
-        if(table[i]){ //there is a card here
+        if(table["cards"][i]){ //there is a card here
             if(playfield.id == "my-playfield"){
               var item = document.createElement('button');
-              item.setAttribute('id', table[i]["id"]);
-              item.innerHTML = table[i]["rank"] + " of " + table[i]["suit"];
+              item.setAttribute('id', table["cards"][i]["id"]);
+              item.innerHTML = table["cards"][i]["rank"] + " of " + table["cards"][i]["suit"];
               item.addEventListener("click", function (e) {
                   e.preventDefault();
                   //alert(this.getAttribute("id"));
@@ -83,13 +75,36 @@ window.addEventListener("load", function () {
               playfield.appendChild(item);
             } else {
               var item = document.createElement('div');
-              item.innerText = table[i]["rank"] + " of " + table[i]["suit"];
-              item.setAttribute('id', table[i]["id"]);
+              item.innerText = table["cards"][i]["rank"] + " of " + table["cards"][i]["suit"];
+              item.setAttribute('id', table["cards"][i]["id"]);
               playfield.appendChild(item);
             }
-        } //end if table[i]
+        } //end if table["cards"][i]
       } //end if(playfield)
     } //end for 0 to 3
+    
+      console.log(table);
+
+    var kitty_space = document.getElementById("kitty");
+    while (kitty_space.firstChild) {
+        kitty_space.removeChild(kitty_space.firstChild);
+    }
+    if(table["kitty"] > 0){
+      var item = document.createElement('div');
+        item.innerHTML = "Kitty: " + table["kitty"] + " cards";
+      kitty_space.appendChild(item);
+
+      item = document.createElement('button');
+      item.innerHTML = "Take";
+      item.addEventListener("click", function (e) {
+          e.preventDefault();
+          //alert(this.getAttribute("id"));
+          socket.emit("take kitty", userId, this.getAttribute("id"));
+      });
+      kitty_space.appendChild(item);
+
+    }
+
   });
 
   socket.on("hand", function (hand) {
