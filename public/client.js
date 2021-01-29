@@ -34,6 +34,15 @@ window.addEventListener("load", function () {
     }
   });
 
+
+  socket.on("game", function (game){
+      if(game['started']){
+          //TODO
+      } else {
+          //TODO
+      }
+  });
+
   socket.on("players", function (players) {
     
       //player1_name = document.querySelectorAll('#player1>.name')[0];
@@ -109,24 +118,46 @@ window.addEventListener("load", function () {
 
   socket.on("hand", function (hand) {
     
+      console.log(hand);
     var hand_div = document.getElementById("hand");
     //clear all existing entries first
     while (hand_div.firstChild) {
         hand_div.removeChild(hand_div.firstChild);
     }
 
+
     //create and add card buttons to the hand
     for (i = 0; i < hand.length; ++i) {
       var item = document.createElement('button');
-      item.setAttribute('class', 'hand');
+      item.classList.add('hand');
+      if(hand[i]["picked"]){
+        item.classList.add('picked');
+      }
       item.setAttribute('id', hand[i]["id"]);
+      item.setAttribute('data-handcount', hand.length);
       item.innerHTML = hand[i]["rank"] + " of " + hand[i]["suit"];
       item.addEventListener("click", function (e) {
           e.preventDefault();
-          //alert(this.getAttribute("id"));
-          socket.emit("play card", userId, this.getAttribute("id"));
+          if(this.dataset['handcount'] > 12){
+              if(this.classList.contains('picked')){
+                  socket.emit("unpick card", userId, this.getAttribute("id"));
+              } else {
+                  socket.emit("pick card", userId, this.getAttribute("id"));
+              }
+
+          } else {
+              socket.emit("play card", userId, this.getAttribute("id"));
+          }
       });
       hand_div.appendChild(item);
+    }
+
+    if(hand.length > 12){
+        if(document.getElementsByClassName('picked').length == 4) {
+            document.getElementById('discard-button').removeAttribute('disabled').classList.remove('disabled');
+        } else {
+            document.getElementById('discard-button').setAttribute('disabled', 'disabled').classList.add('disabled');
+        }
     }
 
   }); //end on "hand"
