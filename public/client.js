@@ -4,7 +4,6 @@ window.addEventListener("load", function () {
   var nameForm = document.getElementById("nameForm");
   var nameInput = document.getElementById("nameInput");
 
-  var newRound = document.getElementById("newRound");
 
   var userId = localStorage.getItem("userId");
   if (userId == null) {
@@ -118,7 +117,7 @@ window.addEventListener("load", function () {
 
   socket.on("hand", function (hand) {
     
-      console.log(hand);
+      //console.log(hand);
     var hand_div = document.getElementById("hand");
     //clear all existing entries first
     while (hand_div.firstChild) {
@@ -152,17 +151,26 @@ window.addEventListener("load", function () {
       hand_div.appendChild(item);
     }
 
-    if(hand.length > 12){
-        if(document.getElementsByClassName('picked').length == 4) {
-            document.getElementById('discard-button').removeAttribute('disabled').classList.remove('disabled');
-        } else {
-            document.getElementById('discard-button').setAttribute('disabled', 'disabled').classList.add('disabled');
-        }
+      // deal with kitty discard button
+    document.getElementById('discard-button').setAttribute('disabled', 'disabled').classList.add('hidden');
+    if(hand.length > 12 && document.getElementsByClassName('picked').length == 4) {
+        document.getElementById('discard-button').removeAttribute('disabled').classList.remove('hidden');
     }
 
   }); //end on "hand"
 
+  var newRound = document.getElementById("newRound");
   newRound.addEventListener("click", function () {
     socket.emit("new round");
   });
+
+  var discard = document.getElementById("discard-button");
+  discard.addEventListener("click", function () {
+    if( ! this.classList.contains('hidden')){
+        socket.emit("discard", userId);
+    }
+  });
+
+
+
 });

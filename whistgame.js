@@ -25,6 +25,7 @@ exports.initGame = function(in_io, in_socket){
   socket.on('play card', playCard);
   socket.on('unplay card', unplayCard);
   socket.on('take kitty', takeKitty);
+  socket.on('discard', discardKitty);
 
 }
 
@@ -115,6 +116,16 @@ function unplayCard(user_id){
 
 function takeKitty(user_id){
     kitty_cards = round.takeKitty(user_id);
+
+    //emit table update to everyone
+    io.emit('table top', round.getTable());
+
+    //emit users's hand which now includes the kitty
+    socket.emit('hand', round.getHand(user_id));
+}
+
+function discardKitty(user_id){
+    round.discardPicks(user_id);
 
     //emit table update to everyone
     io.emit('table top', round.getTable());
