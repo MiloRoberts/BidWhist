@@ -1,4 +1,5 @@
-const express = require('express');
+const PORT = process.env.PORT || 3000;
+const express = require('express') ;
 const app = express();
 //const app = require('express')();
 
@@ -28,6 +29,7 @@ var options = {
   }
 }
 
+//app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 app.use(express.static('public', options))
 
 var whist = require('./whistgame');
@@ -39,6 +41,6 @@ io.on('connection', (socket) => {
   //console.log('a user connected ' + socket.id);
 });
 
-http.listen(3000, () => {
-  console.log('listening on *:3000');
+http.listen(PORT, () => {
+  console.log("listening on *:" + PORT);
 });
