@@ -1,19 +1,17 @@
 window.addEventListener("load", function () {
   var socket = io();
+  socket.emit("identify", get_user_id());
 
+  // name change section
   var nameForm = document.getElementById("nameForm");
   var nameInput = document.getElementById("nameInput");
-
-
-  var userId = get_user_id()
-  socket.emit("identify", userId);
-
   nameForm.addEventListener("submit", function (e) {
     e.preventDefault();
     if (nameInput.value) {
-      socket.emit("set name", userId, nameInput.value);
+      socket.emit("set name", nameInput.value);
     }
   });
+
 
 
   socket.on("game", function (game){
@@ -59,7 +57,7 @@ window.addEventListener("load", function () {
               item.addEventListener("click", function (e) {
                   e.preventDefault();
                   //alert(this.getAttribute("id"));
-                  socket.emit("unplay card", userId, this.getAttribute("id"));
+                  socket.emit("unplay card", this.getAttribute("id"));
               });
 
               playfield.appendChild(item);
@@ -89,7 +87,7 @@ window.addEventListener("load", function () {
       item.addEventListener("click", function (e) {
           e.preventDefault();
           //alert(this.getAttribute("id"));
-          socket.emit("take kitty", userId, this.getAttribute("id"));
+          socket.emit("take kitty", this.getAttribute("id"));
       });
       kitty_space.appendChild(item);
 
@@ -99,7 +97,6 @@ window.addEventListener("load", function () {
 
   socket.on("hand", function (hand) {
     
-      //console.log(hand);
     var hand_div = document.getElementById("hand");
     //clear all existing entries first
     while (hand_div.firstChild) {
@@ -121,23 +118,23 @@ window.addEventListener("load", function () {
           e.preventDefault();
           if(this.dataset['handcount'] > 12){
               if(this.classList.contains('picked')){
-                  socket.emit("unpick card", userId, this.getAttribute("id"));
+                  socket.emit("unpick card", this.getAttribute("id"));
               } else {
-                  socket.emit("pick card", userId, this.getAttribute("id"));
+                  socket.emit("pick card", this.getAttribute("id"));
               }
 
           } else {
-              socket.emit("play card", userId, this.getAttribute("id"));
+              socket.emit("play card", this.getAttribute("id"));
           }
       });
       hand_div.appendChild(item);
     }
 
       // deal with kitty discard button
-    document.getElementById('discard-button').setAttribute('disabled', 'disabled').classList.add('hidden');
-    if(hand.length > 12 && document.getElementsByClassName('picked').length == 4) {
-        document.getElementById('discard-button').removeAttribute('disabled').classList.remove('hidden');
-    }
+    //document.getElementById('discard-button').setAttribute('disabled', 'disabled').classList.add('hidden');
+    //if(hand.length > 12 && document.getElementsByClassName('picked').length == 4) {
+        //document.getElementById('discard-button').removeAttribute('disabled').classList.remove('hidden');
+    //}
 
   }); //end on "hand"
 
@@ -149,7 +146,7 @@ window.addEventListener("load", function () {
   var discard = document.getElementById("discard-button");
   discard.addEventListener("click", function () {
     if( ! this.classList.contains('hidden')){
-        socket.emit("discard", userId);
+        socket.emit("discard");
     }
   });
 

@@ -16,7 +16,6 @@ exports.initGame = function(in_io, in_socket){
 
   socket.on('identify', playerConnected);
   socket.on('disconnect', playerExit);
-  //socket.on('chat message', sendChat);
   socket.on('set name', setName);
   socket.on('new round', nextRound);
   socket.on('new game', newGame);
@@ -35,15 +34,12 @@ function playerConnected(user_id){
 }
 
 function playerExit() {
-  console.log('user disconnected ' + socket.id);
-  //TODO: look up user by socket.id
-  //users.disconnectUser(user_id);
+  //console.log('user disconnected ' + socket.id);
+  //users.disconnectUser(socket.id);
 }
 
-function setName(user_id, name){
-  users.setName(user_id, name);
-  //console.log('message: ' + msg);
-
+function setName(name){
+  users.setName(socket.id, name);
   io.emit('players', users.getPlayers());
 }
 function newGame(){
@@ -69,67 +65,58 @@ function sendGameStatus(){
     io.emit('game', {'started': game_started, 'score': scores});
     if(game_started){
         //send players their hands
-        players = users.getPlayers();
-        for(p in players){
-          //console.log(" player " + p);
-          //console.log(players[p]);
-            let player = players[p];
-            let s = io.sockets.sockets.get(player['socket'])
-            if(s){
-                console.log("emmitting player " + p + " hand");
-                s.emit('hand', round.getHand(player['id']));
-            }
+        for(let [sock_id, sock_obj] of io.sockets.sockets){
+            sock_obj.emit('hand', round.getHand(sock_id));
         }
-
         io.emit('table top', round.getTable());
     }
 
 }
 
-function pickCard(user_id, card_id){
-    round.pickCard(user_id, card_id);
+function pickCard(card_id){
+    round.pickCard(socket.id, card_id);
     //update user's hand
-    socket.emit('hand', round.getHand(user_id));
+    socket.emit('hand', round.getHand(socket.id));
 }
 
-function unpickCard(user_id, card_id){
-    round.unpickCard(user_id, card_id);
+function unpickCard(card_id){
+    round.unpickCard(socket.id, card_id);
     //update user's hand
-    socket.emit('hand', round.getHand(user_id));
+    socket.emit('hand', round.getHand(socket.id));
 }
 
-function playCard(user_id, card_id){
-    round.playCard(user_id, card_id);
+function playCard(card_id){
+    round.playCard(socket.id, card_id);
     //emit table update to everyone
     io.emit('table top', round.getTable());
     //update user's hand
-    socket.emit('hand', round.getHand(user_id));
+    socket.emit('hand', round.getHand(socket.id));
 }
 
-function unplayCard(user_id){
-    round.unplayCard(user_id);
+function unplayCard(){
+    round.unplayCard(socket.id);
     //emit table update to everyone
     io.emit('table top', round.getTable());
     //update user's hand
-    socket.emit('hand', round.getHand(user_id));
+    socket.emit('hand', round.getHand(socket.id));
 }
 
-function takeKitty(user_id){
-    kitty_cards = round.takeKitty(user_id);
-
-    //emit table update to everyone
-    io.emit('table top', round.getTable());
-
-    //emit users's hand which now includes the kitty
-    socket.emit('hand', round.getHand(user_id));
-}
-
-function discardKitty(user_id){
-    round.discardPicks(user_id);
+function takeKitty(){
+    kitty_cards = round.takeKitty(socket.id);
 
     //emit table update to everyone
     io.emit('table top', round.getTable());
 
     //emit users's hand which now includes the kitty
-    socket.emit('hand', round.getHand(user_id));
+    socket.emit('hand', round.getHand(socket.id));
+}
+
+function discardKitty(){
+    round.discardPicks(socket.id);
+
+    //emit table update to everyone
+    io.emit('table top', round.getTable());
+
+    //emit users's hand which now includes the kitty
+    socket.emit('hand', round.getHand(socket.id));
 }
