@@ -2,35 +2,24 @@ window.addEventListener("load", function () {
   var socket = io();
   socket.emit("identify", get_user_id());
 
-  // name change section
-  var nameForm = document.getElementById("nameForm");
-  var nameInput = document.getElementById("nameInput");
-  nameForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    if (nameInput.value) {
-      socket.emit("set name", nameInput.value);
-    }
-  });
-
+  set_game_unstarted();
 
 
   socket.on("game", function (game){
       if(game['started']){
-          //TODO
-      } else {
-          //TODO
+          set_game_started();
+      //} else {
+          //TODO ??
+
       }
   });
 
+
+
   socket.on("players", function (players) {
-    
-      //player1_name = document.querySelectorAll('#player1>.name')[0];
-    //console.log(players);
-    //console.log(socket.id);
+
     for( i in players){
         var name = document.querySelectorAll('#player'+(players[i]["seat"]+1)+'>.name')[0];
-        console.log(name);
-        console.log(players[i]["name"]);
         name.innerText = players[i]["name"];
         if(players[i]["socket"] == socket.id){
             document.querySelectorAll('#player'+(players[i]["seat"]+1)+'>.playfield')[0].setAttribute('id', 'my-playfield');
@@ -38,6 +27,8 @@ window.addEventListener("load", function () {
     }
 
   });
+
+
   socket.on("table top", function(table){
 
     //Update played cards
@@ -96,60 +87,75 @@ window.addEventListener("load", function () {
   });
 
   socket.on("hand", function (hand) {
-    
-    var hand_div = document.getElementById("hand");
-    //clear all existing entries first
-    while (hand_div.firstChild) {
-        hand_div.removeChild(hand_div.firstChild);
+    new_hand(hand);
+
+    if(check_discard_ready()){
+        enable_dicard();
+    } else {
+        disable_discard();
     }
-
-
-    //create and add card buttons to the hand
-    for (i = 0; i < hand.length; ++i) {
-      var item = document.createElement('button');
-      item.classList.add('hand');
-      if(hand[i]["picked"]){
-        item.classList.add('picked');
-      }
-      item.setAttribute('id', hand[i]["id"]);
-      item.setAttribute('data-handcount', hand.length);
-      item.innerHTML = hand[i]["rank"] + " of " + hand[i]["suit"];
-      item.addEventListener("click", function (e) {
-          e.preventDefault();
-          if(this.dataset['handcount'] > 12){
-              if(this.classList.contains('picked')){
-                  socket.emit("unpick card", this.getAttribute("id"));
-              } else {
-                  socket.emit("pick card", this.getAttribute("id"));
-              }
-
-          } else {
-              socket.emit("play card", this.getAttribute("id"));
-          }
-      });
-      hand_div.appendChild(item);
-    }
-
-      // deal with kitty discard button
-    //document.getElementById('discard-button').setAttribute('disabled', 'disabled').classList.add('hidden');
-    //if(hand.length > 12 && document.getElementsByClassName('picked').length == 4) {
-        //document.getElementById('discard-button').removeAttribute('disabled').classList.remove('hidden');
-    //}
 
   }); //end on "hand"
 
-  var newRound = document.getElementById("newRound");
-  newRound.addEventListener("click", function () {
+  // new game section
+    /*
+  document.getElementById("newGame").addEventListener("click", function () {
+    socket.emit("new game");
+  });
+  */
+
+  // new round section
+  document.getElementById("newRound").addEventListener("click", function () {
     socket.emit("new round");
   });
 
-  var discard = document.getElementById("discard-button");
-  discard.addEventListener("click", function () {
-    if( ! this.classList.contains('hidden')){
-        socket.emit("discard");
+  // name change section
+  document.getElementById("nameForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    nameInput = document.getElementById("nameInput");
+    if (nameInput.value) {
+      socket.emit("set name", nameInput.value);
     }
   });
 
 
+  document.getElementById("discard-button").addEventListener("click", function () {
+    if(check_discard_ready()){
+        socket.emit("discard");
+        set_playing();
+    }
+  });
 
+    // set up functions for when a hand card is clicked
+  hand_set = document.getElementsByClassName('hand-card')
+    for(i in hand_set){
+        console.log(i);
+        console.log(hand_set[i]);
+        if(hand_set[i]){
+          hand_set[i].addEventListener("click", function (e) {
+            e.preventDefault();
+            if(is_discarding()){
+                toggle_picked(this);
+      
+                if(is_card_picked(card)){
+                    socket.emit("unpick card", this.getAttribute("id"));
+                } else {
+                    socket.emit("pick card", this.getAttribute("id"));
+                }
+      
+                if(check_discard_ready()){
+                    enable_dicard();
+                } else {
+                    disable_discard();
+                }
+      
+            } else { //not discarding, playing cards
+                if(!card_on_table()){
+                    play_card(card);
+                    socket.emit("play card", this.getAttribute("id"));
+                }
+            }
+          });
+       }
+    }
 });
