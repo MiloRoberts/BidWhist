@@ -5,31 +5,13 @@ window.addEventListener("load", function () {
   var nameInput = document.getElementById("nameInput");
 
 
-  var userId = localStorage.getItem("userId");
-  if (userId == null) {
-    userId =
-      Math.random()
-        .toString(36)
-        .replace(/[^a-z]+/g, "")
-        .substr(0, 5) +
-      Math.random()
-        .toString(36)
-        .replace(/[^a-z]+/g, "")
-        .substr(0, 5) +
-      Math.random()
-        .toString(36)
-        .replace(/[^a-z]+/g, "")
-        .substr(0, 5);
-    localStorage.setItem("userId", userId);
-  }
-
+  var userId = get_user_id()
   socket.emit("identify", userId);
 
   nameForm.addEventListener("submit", function (e) {
     e.preventDefault();
     if (nameInput.value) {
       socket.emit("set name", userId, nameInput.value);
-      //input.value = '';
     }
   });
 
@@ -45,8 +27,8 @@ window.addEventListener("load", function () {
   socket.on("players", function (players) {
     
       //player1_name = document.querySelectorAll('#player1>.name')[0];
-    console.log(players);
-    console.log(socket.id);
+    //console.log(players);
+    //console.log(socket.id);
     for( i in players){
         var name = document.querySelectorAll('#player'+(players[i]["seat"]+1)+'>.name')[0];
         console.log(name);
